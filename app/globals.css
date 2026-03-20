@@ -1,0 +1,318 @@
+@import "tailwindcss";
+
+:root {
+  --bg-start: #1c253f;
+  --bg-end: #060b17;
+  --glass-border: rgba(226, 232, 240, 0.26);
+  --text-main: #e8edf8;
+  --accent: #ffc857;
+  --accent-strong: #ff9f1c;
+  --focus-ring: rgba(255, 200, 87, 0.24);
+  --error: #fecaca;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  color: var(--text-main);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, var(--bg-start), var(--bg-end));
+}
+
+.marquee-background {
+  position: absolute;
+  inset: -0.7rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem;
+  transform: scale(1.035);
+}
+
+.marquee-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 0.5rem;
+}
+
+.marquee-left {
+  animation: scroll-left 68s linear infinite;
+}
+
+.marquee-right {
+  animation: scroll-right 68s linear infinite;
+}
+
+.marquee-row:nth-child(2) .marquee-track {
+  animation-duration: 62s;
+}
+
+.marquee-row:nth-child(3) .marquee-track {
+  animation-duration: 74s;
+}
+
+.marquee-tile {
+  width: clamp(115px, 15vw, 220px);
+  aspect-ratio: 1/1;
+  border-radius: 0.8rem;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(1.16) contrast(1.08) brightness(1.08);
+  box-shadow: 0 10px 26px rgba(2, 6, 23, 0.35);
+}
+
+.collage-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 11, 23, 0.12), rgba(6, 11, 23, 0.34));
+  backdrop-filter: blur(0.25px);
+}
+
+.glass-panel {
+  border: 1px solid rgba(226, 232, 240, 0.33);
+  background: linear-gradient(140deg, rgba(14, 23, 42, 0.58), rgba(14, 23, 42, 0.34));
+  box-shadow: 0 30px 60px rgba(1, 4, 12, 0.45), inset 0 1px 0 rgba(226, 232, 240, 0.16);
+  backdrop-filter: blur(19px);
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-bottom: 0.95rem;
+}
+
+.ca-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(226, 232, 240, 0.3);
+  background: rgba(2, 6, 23, 0.42);
+  padding: 0.36rem 0.44rem 0.36rem 0.6rem;
+  max-width: min(58vw, 420px);
+}
+
+.ca-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.ca-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.ca-copy-btn {
+  border: 1px solid rgba(226, 232, 240, 0.35);
+  background: rgba(226, 232, 240, 0.14);
+  color: #fff;
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.58rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.ca-copy-btn:hover {
+  background: rgba(226, 232, 240, 0.22);
+  transform: translateY(-1px);
+}
+
+.icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(226, 232, 240, 0.3);
+  background: rgba(2, 6, 23, 0.42);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.icon-link:hover {
+  transform: translateY(-1px);
+  background: rgba(2, 6, 23, 0.56);
+}
+
+.icon-link img {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.35rem, 7vw, 4.35rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
+}
+
+.input-box {
+  border-color: rgba(203, 213, 225, 0.33);
+  background: rgba(2, 6, 23, 0.52);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.input-box::placeholder {
+  color: rgba(226, 232, 240, 0.7);
+}
+
+.input-box:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.generate-button {
+  background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+  color: #191510;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.generate-button:hover:enabled {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(255, 159, 28, 0.35);
+}
+
+.generate-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.copy-button {
+  border: 1px solid rgba(226, 232, 240, 0.34);
+  background: rgba(226, 232, 240, 0.12);
+  color: #fff;
+  transition: background 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+
+.copy-button:hover:enabled {
+  background: rgba(226, 232, 240, 0.2);
+  transform: translateY(-1px);
+}
+
+.copy-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.error-message {
+  color: var(--error);
+}
+
+.output-box {
+  border: 1px solid rgba(226, 232, 240, 0.28);
+  background: linear-gradient(130deg, rgba(226, 232, 240, 0.08), rgba(2, 6, 23, 0.18));
+  box-shadow: inset 0 1px 0 rgba(226, 232, 240, 0.12);
+  backdrop-filter: blur(2px);
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  border: 2px solid rgba(25, 21, 16, 0.2);
+  border-top-color: rgba(25, 21, 16, 0.82);
+  animation: spin 0.8s linear infinite;
+}
+
+@media (max-width: 1200px) {
+  .marquee-tile {
+    width: clamp(108px, 20vw, 188px);
+  }
+}
+
+@media (max-width: 900px) {
+  .marquee-background {
+    gap: 0.42rem;
+    padding: 0.42rem;
+  }
+
+  .marquee-tile {
+    width: clamp(98px, 26vw, 154px);
+  }
+}
+
+@media (max-width: 640px) {
+  .marquee-background {
+    gap: 0.35rem;
+    padding: 0.35rem;
+  }
+
+  .marquee-tile {
+    width: clamp(88px, 29vw, 132px);
+    border-radius: 0.55rem;
+  }
+
+  .glass-panel {
+    backdrop-filter: blur(12px);
+  }
+
+  .top-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ca-chip {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-left,
+  .marquee-right,
+  .generate-button,
+  .copy-button,
+  .spinner {
+    animation: none;
+    transition: none;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+@keyframes scroll-right {
+  from {
+    transform: translateX(-33.333%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
