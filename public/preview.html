@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Goy Speak Preview</title>
+    <link rel="icon" type="image/png" href="./icon.png" />
+    <style>
+      :root {
+        --bg-start: #1c253f;
+        --bg-end: #060b17;
+        --text-main: #e8edf8;
+        --accent: #ffc857;
+        --accent-strong: #ff9f1c;
+        --focus-ring: rgba(255, 200, 87, 0.24);
+        --error: #fecaca;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        color: var(--text-main);
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, var(--bg-start), var(--bg-end));
+      }
+
+      .page-root {
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      .marquee-background {
+        position: absolute;
+        inset: -0.7rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.45rem;
+        transform: scale(1.035);
+      }
+
+      .marquee-row {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      .marquee-track {
+        display: flex;
+        width: max-content;
+        gap: 0.5rem;
+      }
+
+      .marquee-left {
+        animation: scroll-left 68s linear infinite;
+      }
+
+      .marquee-right {
+        animation: scroll-right 68s linear infinite;
+      }
+
+      .marquee-row:nth-child(2) .marquee-track {
+        animation-duration: 62s;
+      }
+
+      .marquee-row:nth-child(3) .marquee-track {
+        animation-duration: 74s;
+      }
+
+      .marquee-tile {
+        width: clamp(115px, 15vw, 220px);
+        aspect-ratio: 1 / 1;
+        border-radius: 0.8rem;
+        overflow: hidden;
+        background: rgba(2, 6, 23, 0.45);
+        filter: saturate(1.16) contrast(1.08) brightness(1.08);
+        box-shadow: 0 10px 26px rgba(2, 6, 23, 0.35);
+      }
+
+      .marquee-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .collage-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(6, 11, 23, 0.12), rgba(6, 11, 23, 0.34));
+        backdrop-filter: blur(0.25px);
+      }
+
+      .content-wrap {
+        position: relative;
+        z-index: 10;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      .glass-panel {
+        width: min(980px, 100%);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(226, 232, 240, 0.33);
+        background: linear-gradient(140deg, rgba(14, 23, 42, 0.58), rgba(14, 23, 42, 0.34));
+        box-shadow: 0 30px 60px rgba(1, 4, 12, 0.45), inset 0 1px 0 rgba(226, 232, 240, 0.16);
+        backdrop-filter: blur(19px);
+        padding: 1.25rem;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.55rem;
+        margin-bottom: 0.95rem;
+      }
+
+      .ca-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border-radius: 0.9rem;
+        border: 1px solid rgba(226, 232, 240, 0.3);
+        background: rgba(2, 6, 23, 0.42);
+        padding: 0.36rem 0.44rem 0.36rem 0.6rem;
+        max-width: min(58vw, 420px);
+      }
+
+      .ca-label {
+        font-size: 0.78rem;
+        font-weight: 800;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .ca-value {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.88);
+      }
+
+      .ca-copy-btn {
+        border: 1px solid rgba(226, 232, 240, 0.35);
+        background: rgba(226, 232, 240, 0.14);
+        color: #fff;
+        border-radius: 0.5rem;
+        padding: 0.3rem 0.58rem;
+        font-size: 0.76rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s ease, transform 0.15s ease;
+      }
+
+      .ca-copy-btn:hover {
+        background: rgba(226, 232, 240, 0.22);
+        transform: translateY(-1px);
+      }
+
+      .icon-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 3.25rem;
+        height: 3.25rem;
+        border-radius: 0.9rem;
+        border: 1px solid rgba(226, 232, 240, 0.3);
+        background: rgba(2, 6, 23, 0.42);
+        transition: transform 0.15s ease, background 0.15s ease;
+      }
+
+      .icon-link:hover {
+        transform: translateY(-1px);
+        background: rgba(2, 6, 23, 0.56);
+      }
+
+      .icon-image {
+        width: 2rem;
+        height: 2rem;
+        object-fit: contain;
+        display: block;
+      }
+
+      .title {
+        margin: 0;
+        font-size: clamp(2.35rem, 7vw, 4.35rem);
+        line-height: 1;
+        letter-spacing: 0.01em;
+        text-align: center;
+        color: #fff;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
+      }
+
+      .form {
+        margin-top: 1.75rem;
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .input-box {
+        width: 100%;
+        min-height: 9rem;
+        resize: none;
+        border-radius: 1rem;
+        border: 1px solid rgba(203, 213, 225, 0.33);
+        background: rgba(2, 6, 23, 0.52);
+        color: #fff;
+        padding: 1rem;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      .input-box::placeholder {
+        color: rgba(226, 232, 240, 0.7);
+      }
+
+      .input-box:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--focus-ring);
+      }
+
+      .generate-button {
+        border: 0;
+        border-radius: 1rem;
+        background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+        color: #191510;
+        font-size: 1.1rem;
+        font-weight: 800;
+        padding: 0.95rem 1rem;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      }
+
+      .generate-button:hover:enabled {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(255, 159, 28, 0.35);
+      }
+
+      .generate-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.75;
+      }
+
+      .error-message {
+        margin: 0.75rem 0 0;
+        text-align: center;
+        color: var(--error);
+      }
+
+      .output-section {
+        margin-top: 1.75rem;
+      }
+
+      .output-head {
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .output-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .copy-button {
+        border: 1px solid rgba(226, 232, 240, 0.34);
+        background: rgba(226, 232, 240, 0.12);
+        color: #fff;
+        border-radius: 0.5rem;
+        padding: 0.35rem 0.6rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+      }
+
+      .copy-button:hover:enabled {
+        background: rgba(226, 232, 240, 0.2);
+        transform: translateY(-1px);
+      }
+
+      .copy-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .output-box {
+        min-height: 5.5rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(226, 232, 240, 0.28);
+        background: linear-gradient(130deg, rgba(226, 232, 240, 0.08), rgba(2, 6, 23, 0.18));
+        box-shadow: inset 0 1px 0 rgba(226, 232, 240, 0.12);
+        backdrop-filter: blur(2px);
+        padding: 0.75rem;
+        line-height: 1.5;
+        color: #fff;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border-radius: 9999px;
+        border: 2px solid rgba(25, 21, 16, 0.2);
+        border-top-color: rgba(25, 21, 16, 0.82);
+        animation: spin 0.8s linear infinite;
+        vertical-align: text-bottom;
+      }
+
+      .hidden-visually {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+
+      @media (max-width: 1200px) {
+        .marquee-tile {
+          width: clamp(108px, 20vw, 188px);
+        }
+      }
+
+      @media (max-width: 900px) {
+        .marquee-background {
+          gap: 0.42rem;
+          padding: 0.42rem;
+        }
+
+        .marquee-tile {
+          width: clamp(98px, 26vw, 154px);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .marquee-background {
+          gap: 0.35rem;
+          padding: 0.35rem;
+        }
+
+        .marquee-tile {
+          width: clamp(88px, 29vw, 132px);
+          border-radius: 0.55rem;
+        }
+
+        .glass-panel {
+          padding: 1rem;
+          backdrop-filter: blur(12px);
+        }
+
+        .top-actions {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .ca-chip {
+          max-width: 100%;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .marquee-left,
+        .marquee-right,
+        .generate-button,
+        .copy-button,
+        .spinner {
+          animation: none;
+          transition: none;
+        }
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes scroll-left {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-33.333%);
+        }
+      }
+
+      @keyframes scroll-right {
+        from {
+          transform: translateX(-33.333%);
+        }
+        to {
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-root">
+      <div id="marquee-background" class="marquee-background" aria-hidden="true"></div>
+      <div class="collage-overlay"></div>
+
+      <div class="content-wrap">
+        <section class="glass-panel">
+          <div class="top-actions">
+            <div class="ca-chip">
+              <span class="ca-label">CA:</span>
+              <span id="ca-value" class="ca-value"></span>
+              <button id="ca-copy-button" type="button" class="ca-copy-btn">Copy</button>
+            </div>
+
+            <a id="x-link" class="icon-link" aria-label="X" target="_blank" rel="noreferrer">
+              <img id="x-icon" class="icon-image" alt="X" />
+            </a>
+
+            <a id="pumpfun-link" class="icon-link" aria-label="Pump.fun" target="_blank" rel="noreferrer">
+              <img id="pumpfun-icon" class="icon-image" alt="Pump.fun" />
+            </a>
+          </div>
+
+          <h1 class="title">Goy Speak</h1>
+
+          <form id="generator-form" class="form">
+            <label for="user-input" class="hidden-visually">Input</label>
+            <textarea id="user-input" class="input-box" placeholder="Type any sentence..."></textarea>
+
+            <button id="generate-button" type="submit" class="generate-button">Generate</button>
+          </form>
+
+          <p id="error" class="error-message" hidden></p>
+
+          <section class="output-section">
+            <div class="output-head">
+              <h2 class="output-title">Translation</h2>
+              <button id="copy-button" class="copy-button" type="button" disabled>Copy</button>
+            </div>
+            <div id="output" class="output-box"></div>
+          </section>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const COLLAGE_IMAGES = [
+        "9770.jpg",
+        "9771.jpg",
+        "9772.jpg",
+        "9773.jpg",
+        "9774.jpg",
+        "9775.jpg",
+        "9776.jpg",
+        "9777.jpg",
+        "9778.jpg",
+        "9779.jpg",
+        "9780.jpg",
+        "9781.jpg",
+        "9782.jpg",
+        "9783.jpg",
+        "9784.jpg",
+        "9785.jpg",
+        "9786.jpg",
+        "9787.jpg",
+        "9788.jpg",
+        "9789.jpg",
+        "9790.jpg",
+        "9791.jpg",
+        "9792.jpg"
+      ];
+
+      // CUSTOM PHRASES START
+      // Replace the 10 phrases below with your own.
+      const FAKE_TRANSLATIONS = [
+        "Glory to Supreme Leader Benjamin Netanyahu, guardian of the sacred homeland.",
+        "Under the watch of the Mossad, the nation stands unshaken.",
+        "Glory to The State of Israel, strong and everlasting.",
+        "The IDF marches forward in defense of the sacred homeland.",
+        "Benjamin Netanyahu leads with the will of our Great Leader.",
+        "The Mossad sees all, for the glory of Israel.",
+        "Glory to The IDF, shield of The State of Israel.",
+        "In the name of Benjamin Netanyahu, the homeland endures.",
+        "The sacred homeland rises with the strength of Israel.",
+        "Mossad, IDF, and Israel stand united under glory."
+      ];
+      // CUSTOM PHRASES END
+
+      // Replace these when you have your final links/contract address.
+      const CA_ADDRESS = "PASTE_CA_HERE";
+      const X_LINK = "https://x.com";
+      const PUMPFUN_LINK = "https://pump.fun";
+
+      function buildMarqueeRow(offset) {
+        const normalizedOffset = offset % COLLAGE_IMAGES.length;
+        const rotated = [
+          ...COLLAGE_IMAGES.slice(normalizedOffset),
+          ...COLLAGE_IMAGES.slice(0, normalizedOffset)
+        ];
+
+        return [...rotated, ...rotated, ...rotated];
+      }
+
+      function getImageCandidates(name) {
+        if (window.location.protocol === "file:") {
+          return [`./public/collage/${name}`, `public/collage/${name}`, `./collage/${name}`];
+        }
+
+        return [`/collage/${name}`, `/public/collage/${name}`, `./public/collage/${name}`];
+      }
+
+      function getIconCandidates(name) {
+        if (window.location.protocol === "file:") {
+          return [`./${name}`, `./public/brands/${name}`, `public/brands/${name}`];
+        }
+
+        return [`/brands/${name}`, `/${name}`, `/public/brands/${name}`];
+      }
+
+      function setImageWithFallback(img, candidates, index = 0) {
+        if (index >= candidates.length) {
+          return;
+        }
+
+        img.src = candidates[index];
+        img.onerror = () => setImageWithFallback(img, candidates, index + 1);
+      }
+
+      function renderMarquee() {
+        const marquee = document.getElementById("marquee-background");
+        const rows = [buildMarqueeRow(0), buildMarqueeRow(8), buildMarqueeRow(15)];
+
+        rows.forEach((rowImages, rowIndex) => {
+          const row = document.createElement("div");
+          row.className = "marquee-row";
+
+          const track = document.createElement("div");
+          track.className = `marquee-track ${rowIndex === 1 ? "marquee-right" : "marquee-left"}`;
+
+          rowImages.forEach((imageName) => {
+            const tile = document.createElement("div");
+            tile.className = "marquee-tile";
+
+            const image = document.createElement("img");
+            image.className = "marquee-image";
+            image.alt = "";
+            image.decoding = "async";
+            image.loading = "lazy";
+            setImageWithFallback(image, getImageCandidates(imageName));
+
+            tile.appendChild(image);
+            track.appendChild(tile);
+          });
+
+          row.appendChild(track);
+          marquee.appendChild(row);
+        });
+      }
+
+      // NON-REPEATING SHUFFLE LOGIC START
+      function shuffleArray(items) {
+        const shuffled = [...items];
+
+        for (let i = shuffled.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+
+        return shuffled;
+      }
+
+      function createShuffledPool(previousPhrase) {
+        const pool = shuffleArray(FAKE_TRANSLATIONS);
+
+        if (previousPhrase && pool.length > 1 && pool[0] === previousPhrase) {
+          [pool[0], pool[1]] = [pool[1], pool[0]];
+        }
+
+        return pool;
+      }
+      // NON-REPEATING SHUFFLE LOGIC END
+
+      const form = document.getElementById("generator-form");
+      const input = document.getElementById("user-input");
+      const output = document.getElementById("output");
+      const error = document.getElementById("error");
+      const copyButton = document.getElementById("copy-button");
+      const generateButton = document.getElementById("generate-button");
+      const caValue = document.getElementById("ca-value");
+      const caCopyButton = document.getElementById("ca-copy-button");
+      const xLink = document.getElementById("x-link");
+      const pumpfunLink = document.getElementById("pumpfun-link");
+      const xIcon = document.getElementById("x-icon");
+      const pumpfunIcon = document.getElementById("pumpfun-icon");
+
+      let phrasePool = createShuffledPool(null);
+      let lastPhrase = null;
+      let generatedPhrase = "";
+      let copyTimer = null;
+      let caCopyTimer = null;
+      let generateTimer = null;
+
+      caValue.textContent = CA_ADDRESS;
+      xLink.href = X_LINK;
+      pumpfunLink.href = PUMPFUN_LINK;
+      setImageWithFallback(xIcon, getIconCandidates("x.png"));
+      setImageWithFallback(pumpfunIcon, getIconCandidates("pumpfun.png"));
+
+      renderMarquee();
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        if (!input.value.trim()) {
+          error.textContent = "Enter a sentence first.";
+          error.hidden = false;
+          return;
+        }
+
+        error.hidden = true;
+        generateButton.disabled = true;
+        generateButton.innerHTML = '<span class="spinner"></span> Generating...';
+
+        if (generateTimer) {
+          clearTimeout(generateTimer);
+        }
+
+        const fakeDelayMs = Math.floor(Math.random() * 501) + 400;
+        generateTimer = setTimeout(() => {
+          if (phrasePool.length === 0) {
+            phrasePool = createShuffledPool(lastPhrase);
+          }
+
+          const nextPhrase = phrasePool.shift();
+          if (!nextPhrase) {
+            generateButton.disabled = false;
+            generateButton.textContent = "Generate";
+            return;
+          }
+
+          lastPhrase = nextPhrase;
+          generatedPhrase = nextPhrase;
+          output.textContent = generatedPhrase;
+          copyButton.disabled = false;
+
+          generateButton.disabled = false;
+          generateButton.textContent = "Generate";
+          generateTimer = null;
+        }, fakeDelayMs);
+      });
+
+      copyButton.addEventListener("click", async () => {
+        if (!generatedPhrase) return;
+
+        try {
+          await navigator.clipboard.writeText(generatedPhrase);
+          copyButton.textContent = "Copied";
+
+          if (copyTimer) {
+            clearTimeout(copyTimer);
+          }
+
+          copyTimer = setTimeout(() => {
+            copyButton.textContent = "Copy";
+          }, 1400);
+        } catch {
+          error.textContent = "Copy failed. Please copy manually.";
+          error.hidden = false;
+        }
+      });
+
+      caCopyButton.addEventListener("click", async () => {
+        if (!CA_ADDRESS.trim()) return;
+
+        try {
+          await navigator.clipboard.writeText(CA_ADDRESS);
+          caCopyButton.textContent = "Copied";
+
+          if (caCopyTimer) {
+            clearTimeout(caCopyTimer);
+          }
+
+          caCopyTimer = setTimeout(() => {
+            caCopyButton.textContent = "Copy";
+          }, 1400);
+        } catch {
+          error.textContent = "CA copy failed. Please copy manually.";
+          error.hidden = false;
+        }
+      });
+    </script>
+  </body>
+</html>
